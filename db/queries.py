@@ -12,7 +12,7 @@ async def get_conn():
     return await aiomysql.connect(
         host="localhost",
         user="root",
-        password="pword",
+        password="#KOF.Terry13",
         db="mkt",
         cursorclass=aiomysql.DictCursor,  
     )
