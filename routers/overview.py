@@ -9,8 +9,8 @@ router = APIRouter(prefix="/api/overview", tags=["overview"])
 @router.get("/")
 async def get_overview(
     brand:   str = BrandParam,
-    channel: Literal["all", "lin", "x"] = ChannelParam,
-    period:  Literal["7d", "30d", "90d", "1y"] = PeriodParam,
+    channel: Channel = ChannelParam,
+    period:  Period = PeriodParam,
 ):
     return await overview_service.get_overview(brand, channel, period)
 
@@ -22,7 +22,7 @@ async def get_timeseries(
     brand:   str    = BrandParam,
     channel: Channel = ChannelParam,
     period:  Period  = PeriodParam,
-    metric:  Metric  = MetricParam,   # new
+    metric:  Metric  = MetricParam,   
 ):
     return await overview_service.get_timeseries(brand, channel, period, metric)
 
@@ -30,7 +30,7 @@ async def get_timeseries(
 @router.get("/followers")
 async def get_followers(
     brand:   str = BrandParam,
-    channel: Literal["all", "lin", "x"] = ChannelParam,
-    period:  Literal["7d", "30d", "90d", "1y"] = PeriodParam,
+    channel: Channel = ChannelParam,
+    period:  Period = PeriodParam,
 ):
     return await overview_service.get_followers(brand, channel, period)

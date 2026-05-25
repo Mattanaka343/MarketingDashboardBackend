@@ -2,9 +2,9 @@ from db import queries
 from utils import period_to_date
 
 
-async def get_top_posts(brand: str, channel: str, period: str, limit: int) -> list:
+async def get_top_posts(brand: str, channel: str, period: str, limit: int, metric: str) -> list:
     since, until = period_to_date(period)
-    return await queries.fetch_top_posts(brand, channel, since, until, limit)
+    return await queries.fetch_top_posts(brand, channel, since, until, limit, metric)
 
 
 async def get_clusters(brand: str, channel: str) -> list:

@@ -5,7 +5,7 @@ from typing import Literal
 
 MetricParam = Query("impressions", description="Which metric to plot on the timeline")
 BrandParam   = Query("nvai",    description="nvai, buis or tal")
-ChannelParam = Query("all",  description="'all', 'lin', or 'x'")
+ChannelParam = Query("all",  description="'all', 'lin', 'x', or 'insta'")
 PeriodParam  = Query("90d",  description="'7d', '30d', '90d', or '1y'")
 
 # Type aliases — use these in function signatures for consistent validation
