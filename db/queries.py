@@ -28,10 +28,10 @@ CHANNEL_MAP = {
 
 async def get_conn():
     return await aiomysql.connect(
-        host=os.getenv('HOST'),
-        user=os.getenv('USER'),
-        password=os.getenv('PASSWORD'),
-        db=os.getenv('Marketing'),
+        host=os.getenv('DB_HOST'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        db=os.getenv('DB_NAME'),
         cursorclass=aiomysql.DictCursor,  
     )
 
@@ -81,7 +81,7 @@ async def fetch_timeseries(
             SELECT
                 m.date,
                 SUM(CASE WHEN sma.channel = 'LinkedIn' THEN {col} ELSE 0 END) AS linkedin,
-                SUM(CASE WHEN chan = 'X'   THEN {col} ELSE 0 END) AS x
+                SUM(CASE WHEN sma.channel = 'X'   THEN {col} ELSE 0 END) AS x
             FROM Metrics m
             JOIN SocialMediaAccounts sma
                 ON m.account_id = sma.id
