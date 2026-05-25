@@ -16,7 +16,7 @@ METRIC_COL = {
 BRAND_MAP = {
     "nvai": "Nurvai",
     "buis": "Wexpand",
-    "tal": "Wepand Talent"
+    "tal": "Wexpand Talent"
 }
 
 CHANNEL_MAP = {
