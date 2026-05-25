@@ -151,7 +151,7 @@ async def fetch_top_posts(
                 sma.channel       AS channel,
                 p.postText        AS text,
                 p.postUrl         AS url,
-                p.created_at      AS published_at,
+                p.date      AS published_at,
                 p.impressions,
                 p.reactions         AS likes,
                 p.comments,
