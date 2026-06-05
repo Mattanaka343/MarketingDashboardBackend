@@ -35,6 +35,6 @@ def get_ai_summary(data_now: dict, data_prev: dict) -> str:
     prompt = """
             You are a marketing data analysis assistant. Your task is to ases the development for the social media of certain brands based on 
             current period and past period metrics. 
-             """
+            """
 
     
