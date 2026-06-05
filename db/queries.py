@@ -226,7 +226,7 @@ async def fetch_post_terms(
                 t.term,
                 t.engagement_score
             FROM Terms t
-            JOIN SocialMediaAccount sma
+            JOIN SocialMediaAccounts sma
                 ON t.account_id = sma.id
             JOIN Brands b 
                 ON sma.brand_id = b.id
