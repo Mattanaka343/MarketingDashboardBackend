@@ -1,5 +1,6 @@
 from db import queries
 from utils import period_to_date, period_to_previous_dates
+import ollama 
 
 
 async def get_overview(brand: str, channel: str, period: str) -> dict:
@@ -41,3 +42,11 @@ def _pct_change(old: float, new: float) -> float:
     if not old:
         return 0.0
     return round((new - old) / old * 100, 1)
+
+async def ai_overview(brand: str, channel: str, period: str) -> dict:
+    since, until = period_to_date(period)
+    prev_since, prev_until = period_to_previous_dates(period)
+
+    current  = await queries.fetch_overview_metrics(brand, channel, since, until)
+    previous = await queries.fetch_overview_metrics(brand, channel, prev_since, prev_until)
+

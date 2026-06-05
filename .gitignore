@@ -3,3 +3,4 @@ db/__pycache__/
 db/.env
 routers/__pycache__/
 services/__pycache__/
+.env

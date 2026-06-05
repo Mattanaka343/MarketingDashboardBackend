@@ -199,8 +199,8 @@ async def fetch_post_clusters(brand: str, channel: str) -> list:
                 ON p.account_id = sma.id
             JOIN Brands b
                 ON sma.brand_id = b.id
-            WHERE acc = %s
-              AND (%s = 'all' OR chan = %s)
+            WHERE b.name = %s
+              AND (%s = 'all' OR sma.channel = %s)
               AND p.umap_x IS NOT NULL
               AND p.umap_y IS NOT NULL
         """, (brand, channel, channel))
@@ -238,5 +238,6 @@ async def fetch_post_terms(
     return rows
 
 async def insert_new_format():
+    
     pass
 
