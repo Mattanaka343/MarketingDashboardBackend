@@ -230,7 +230,7 @@ async def fetch_post_terms(
                 ON t.account_id = sma.id
             JOIN Brands b 
                 ON sma.brand_id = b.id
-            WHERE b.brand  = %s
+            WHERE b.name  = %s
               AND (%s = 'all' OR sma.channel = %s)
         """, (brand, channel, channel))
         rows = await cur.fetchall()
