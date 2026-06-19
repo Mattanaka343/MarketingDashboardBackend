@@ -1,3 +1,4 @@
 aiomysql
 fastapi
+ollama
 python-dotenv

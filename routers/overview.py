@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from typing import Literal
 from dependencies import BrandParam, ChannelParam, PeriodParam, Channel, Period, MetricParam, Metric
 from services import overview as overview_service
+from services import ai as ai_service
 
 router = APIRouter(prefix="/api/overview", tags=["overview"])
 
@@ -34,3 +35,7 @@ async def get_followers(
     period:  Period = PeriodParam,
 ):
     return await overview_service.get_followers(brand, channel, period)
+
+@router.get("/aireview")
+async def get_ai_review(brand:str, channel:str, period:str) -> dict:
+    return await ai_service.get_ai_review(brand,channel,period) 

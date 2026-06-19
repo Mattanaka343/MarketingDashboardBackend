@@ -210,7 +210,7 @@ async def fetch_post_clusters(brand: str, channel: str) -> list:
 
 
 async def fetch_post_terms(
-    brand: str, channel: str, since: date, until: date
+    brand: str, channel: str
 ) -> list:
     """
     Returns raw term scores from your terms table.
@@ -237,7 +237,313 @@ async def fetch_post_terms(
     conn.close()
     return rows
 
-async def insert_new_format():
+async def insert_new_format(format: str) -> None:
+    conn  = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            INSERT INTO Formats (format)
+            VALUES (%s)
+            """, (format,)
+        )
     
-    pass
+    await conn.commit()
+    conn.close()
+
+async def insert_new_strat_pillar(brand_id: int, pillar: str) -> None:
+    conn = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            INSERT INTO StrategyPillars (brand_id, pillar)
+            VALUES (%s, %s)
+            """,(brand_id,pillar)
+        ) 
+    
+    await conn.commit()
+    conn.close()
+
+async def insert_new_utm(brand_id:int, source: str, campaing: str, medium:str) -> None:
+    conn = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            INSERT INTO Sources (brand_id, source, campaign, medium)
+            VALUEES (%s,%s,%s,%s)
+            """,(brand_id,source,campaing,medium)
+        )
+    await conn.commit()
+    conn.close()
+
+async def fetch_id_from_brand(brand:str ) -> int:
+    conn = await get_conn()
+    brand = BRAND_MAP[brand]
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT id
+            FROM Brands
+            WHERE name = %s
+            """,(brand,)
+        )
+        result = await cur.fetchone()
+    conn.close
+    return result
+
+async def fetch_displayed_links(brand:str) -> list:
+    conn = await get_conn()
+    brand = BRAND_MAP[brand]
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT  s.source         AS source,
+                    s.medium         AS medium,
+                    s.campaign       AS campaign
+            FROM sources s
+            JOIN Brands b 
+                ON s.brand_id = b.id 
+            WHERE b.name = %s
+            """, (brand,)
+        )
+        rows = await cur.fetchall()
+    conn.close()
+    return rows
+
+async def fetch_pending_posts(brand:str,channel:str)->list:
+    conn = await get_conn()
+    brand =  BRAND_MAP[brand]
+    channel = CHANNEL_MAP[channel]
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT  p.postText     AS text,
+                    p.postUrl      AS url,
+                    p.date         AS date,
+                    b.name         AS brand,
+                    sma.channel    AS channel,
+                    p.row_hash     AS id
+            FROM Posts p
+            JOIN SocialMediaAccounts sma
+                ON p.account_id = sma.id
+            JOIN Brands b
+                ON sma.brand_id = b.id
+            
+            WHERE b.name = %s                      AND
+                  (%s = 'all' OR sma.channel = %s) AND
+                  (p.format_id IS NULL)            AND
+                  (p.content_pillar_id IS NULL)    AND
+                  (p.strategy_pillar_id IS NULL)   
+            """, (brand,channel,channel)
+        )
+        rows = await cur.fetchall()
+    conn.close()
+    return rows
+
+async def fetch_unpending_posts(brand:str, channel:str) ->list:
+    conn = await get_conn()
+    brand = BRAND_MAP[brand]
+    channel = CHANNEL_MAP[channel]
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT  p.postText      AS text,
+                    p.postUrl       AS url,
+                    p.date          AS date,
+                    b.name          AS brand,
+                    sma.channel     AS channel,
+                    f.format        AS format,
+                    stp.pillar      AS strategy_pillar,
+                    ctp.pillar      AS content_pillar,
+                    p.row_hash      AS id
+
+            FROM Posts p
+            JOIN SocialMediaAccounts sma
+                ON p.account_id = sma.id
+            JOIN Brands b
+                ON sma.brand_id = b.id
+            JOIN Formats f
+                ON p.format_id = f.id
+            JOIN StrategyPillars stp
+                ON p.strategy_pillar_id = stp.id
+            JOIN ContentPillars ctp
+                ON p.content_pillar_id = ctp.id
+
+            WHERE b.name = %s           AND
+                  (%s = 'all' OR sma.channel = %s)
+            """, (brand,channel,channel)
+        )
+        rows = await cur.fetchall()
+    conn.close()
+    return rows
+
+async def fetch_day_met_data(brand:str, channel:str) -> list:
+    conn = await get_conn()
+    brand = BRAND_MAP[brand]
+    channel = CHANNEL_MAP[channel]
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT  m.impressions           AS impressions,
+                    m.engagementRate        AS engagement_rate,
+                    m.engagements           AS engagements,
+                    m.replies               AS replies,
+                    m.bookmarks             AS bookmarks,
+                    m.clicks                AS clicks,
+                    m.row_hash              AS id,
+                    m.date                  AS date,
+                    b.name                  AS brand,
+                    sma.channel             AS channel
+
+            FROM Metrics m
+            JOIN SocialMediaAccounts sma
+                ON m.account_id = sma.id
+            JOIN Brands b
+                ON sma.brand_id = b.id
+
+            WHERE   b.name = %s           AND
+                    (%s = 'all' OR sma.channel = %s)
+            """, (brand,channel,channel)
+        )
+        rows = await cur.fetchall()
+    conn.close()
+    return rows
+
+async def fetch_all_formats() -> list:
+    conn = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT format
+            FROM Formats
+            """
+        )
+        rows = await cur.fetchall()
+    conn.close()
+    return rows 
+
+async def fetch_all_strat_pillars(brand: str) -> list:
+    conn = await get_conn()
+    brand = BRAND_MAP[brand]
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT pillar
+            FROM StrategyPillars
+            """
+        )
+        rows = await cur.fetchall()
+    conn.close()
+    return rows
+
+async def fetch_all_content_pillars() ->list:
+    conn = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT pillar
+            FROM ContentPillars
+            """
+        )
+        rows = await cur.fetchall()
+    conn.close()
+    return rows
+
+async def fetch_id_from_format(format:str) -> int:
+    conn = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT id
+            FROM Formats
+            WHERE format = %s
+            """,(format,)
+        )
+        result = await cur.fetchone()
+    conn.close()
+    return result
+
+async def fetch_id_from_strat_pillar(pillar:str) ->int:
+    conn = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT id
+            FROM StrategyPillars
+            WHERE pillar = %s
+            """, (pillar,)
+        )
+        result = await cur.fetchone()
+    conn.close()
+    return result
+
+async def fetch_id_from_content_pillar(pillar:str) -> int:
+    conn = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT id
+            FROM ContentPillars
+            WHERE pillar = %s 
+            """, (pillar,)
+        )
+        result = await cur.fetchone()
+    conn.close()
+    return result
+
+async def update_pending_post(post_id: str,format_id: int,strat_pillar_id: int,content_pillar_id: int) -> None:
+    conn = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            UPDATE Posts
+            SET format_id = %s,
+                content_pillar_id = %s,
+                strategy_pillar_id = %s
+            WHERE id = %s
+            """,(format_id,content_pillar_id,strat_pillar_id,post_id)
+        )
+    await conn.commit()
+    conn.close()
+
+async def fetch_ai_food_data(brand:str,channel:str,since:date, until:date) -> list:
+
+    brand = BRAND_MAP[brand]
+    channel = CHANNEL_MAP[channel]
+
+    conn = await get_conn()
+    async with conn.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT  m.date                  AS date,
+                    m.impressions           AS impressions,
+                    m.bookmarks             AS bookmarks,
+                    m.clicks                AS clicks,
+                    m.engagements           AS engagements,
+                    m.engagementRate        AS engagementRate,
+                    m.followersGained       AS followersGained,
+                    m.followersTotal        AS followersTotal,
+                    m.shares                AS shares,
+                    m.unfollows             AS unfollows,
+                    b.name                  AS brand,
+                    sma.channel             AS channel
+
+            FROM Metrics m
+            JOIN SocialMediaAccounts sma
+                ON m.account_id = sma.id
+            JOIN Brands b
+                ON sma.brand_id = b.id
+            
+            WHERE   b.name = %s                           AND
+                    ('all' = %s OR sma.channel = %s)      AND
+                    m.date >= %s                          AND
+                    m.date <= %s          
+            """,(brand,channel,channel,since,until)
+        )
+
+        rows = await cur.fetchall()
+
+    conn.close()
+    return rows
+
+
 

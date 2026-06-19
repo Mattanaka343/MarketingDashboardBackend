@@ -1,6 +1,6 @@
 from db import queries
 from utils import period_to_date, period_to_previous_dates
-import ollama 
+
 
 
 async def get_overview(brand: str, channel: str, period: str) -> dict:

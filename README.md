@@ -55,8 +55,5 @@ In this .env file you need to include the following:
 - `PASSWORD`: The users password in order to access the database 
 - `DB`: The name of the database in the sql schema
 
-### Functions
-
-The main functions of this file are the following:
 
 

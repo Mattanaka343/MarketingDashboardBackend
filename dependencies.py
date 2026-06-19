@@ -12,3 +12,4 @@ PeriodParam  = Query("90d",  description="'7d', '30d', '90d', or '1y'")
 Channel = Literal["all", "lin", "x"]
 Period  = Literal["7d", "30d", "90d", "1y"]
 Metric = Literal["impressions", "engagementRate", "engagements", "reactions"]
+Brand = Literal["nvai", "buis", "tal"]
