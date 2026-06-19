@@ -4,7 +4,7 @@ async def get_all_formats() -> list:
     return await queries.fetch_all_formats()
 
 async def get_all_content_pillars() -> list:
-    return await queries.fetch_all_content_pillars
+    return await queries.fetch_all_content_pillars()
 
 async def get_all_strat_pillars(brand: str) -> list:
     return await queries.fetch_all_strat_pillars(brand)
