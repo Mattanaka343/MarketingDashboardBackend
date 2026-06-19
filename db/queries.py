@@ -386,8 +386,6 @@ async def fetch_day_met_data(brand:str, channel:str) -> list:
             SELECT  m.impressions           AS impressions,
                     m.engagementRate        AS engagement_rate,
                     m.engagements           AS engagements,
-                    m.replies               AS replies,
-                    m.bookmarks             AS bookmarks,
                     m.clicks                AS clicks,
                     m.row_hash              AS id,
                     m.date                  AS date,
