@@ -1,13 +1,16 @@
 import os
 import ollama
 import json
+import asyncio
 
 from datetime import date, timedelta
 from dotenv import load_dotenv
+from google.antigravity import Agent, LocalAgentConfig
 
 load_dotenv()
 
 LLM_MODEL = os.getenv('LLM_MODEL')
+GEM_API_KEY = os.getenv('GEMINI_API_KEY')
 PERIOD_DAYS = {"7d": 7, "30d": 30, "90d": 90, "1y": 365}
 
 
@@ -33,21 +36,22 @@ def period_to_previous_dates(period: str) -> tuple[date, date]:
     since = until - timedelta(days=days)
     return since, until
 
-def analyze_organic_marketing(organic_data: list) -> str:
+    
+async def analyze_organic_marketing(organic_data: list) -> str:
     """
     Analyzes organic social media (LinkedIn, X, IG) and website traffic data 
-    using Ollama to find content winners, platform friction, and growth opportunities.
+    using the Google Antigravity SDK agent loop.
     """
 
     formatted_data = json.dumps(
-                                organic_data,
-                                indent=2,
-                                default=str
-                                )
+        organic_data,
+        indent=2,
+        default=str
+    )
     
-    # We update the system prompt to focus strictly on organic growth, 
-    # content performance, and cross-channel attribution.
-    system_prompt = (
+    # In the Antigravity SDK, system prompts are passed directly 
+    # to the LocalAgentConfig as system_instructions.
+    system_instructions = (
         "You are an expert Organic Growth Marketer and Social Media Strategist. "
         "Your goal is to analyze organic metrics across LinkedIn, X (Twitter), Instagram, and Web. "
         "Look closely at the relationship between impressions and engagement (Content Quality), "
@@ -66,18 +70,17 @@ def analyze_organic_marketing(organic_data: list) -> str:
     )
     
     try:
-        response = ollama.chat(
-            model=LLM_MODEL,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            options={
-                "temperature": 0.2  # Keep it grounded strictly in the provided metrics
-            }
+        # Initialize the config with your system framework
+        config = LocalAgentConfig(
+            api_key=GEM_API_KEY,
+            system_instructions=system_instructions
         )
-        return response['message']['content']
+        
+        # Spin up the stateful Antigravity agent context
+        async with Agent(config) as agent:
+            response = await agent.chat(user_prompt)
+            # Await the text generation result from the response object
+            return await response.text()
 
     except Exception as e:
-        return f"Error analyzing organic data: {str(e)}"
-    
+        return f"Error analyzing organic data via Antigravity SDK: {str(e)}"

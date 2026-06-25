@@ -2,3 +2,5 @@ aiomysql
 fastapi
 ollama
 python-dotenv
+google-antigravity
+

@@ -497,7 +497,7 @@ async def update_pending_post(post_id: str,format_id: int,strat_pillar_id: int,c
             SET format_id = %s,
                 content_pillar_id = %s,
                 strategy_pillar_id = %s
-            WHERE id = %s
+            WHERE row_hash = %s
             """,(format_id,content_pillar_id,strat_pillar_id,post_id)
         )
     await conn.commit()

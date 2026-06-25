@@ -28,9 +28,13 @@ async def add_new_strat_pillar(pillar:str, brand:str) -> None:
 
 async def update_pending_posts(strat_pillar: str, content_pillar:str ,format: str,post_id: str) -> None:
     format_id = await queries.fetch_id_from_format(format)
+    format_id = format_id["id"]
     strat_pillar_id = await queries.fetch_id_from_strat_pillar(strat_pillar)
+    strat_pillar_id = strat_pillar_id["id"]
     content_pillar_id = await queries.fetch_id_from_content_pillar(content_pillar)
-    
+    content_pillar_id = content_pillar_id["id"]
+
+
     await queries.update_pending_post(post_id,format_id,strat_pillar_id,content_pillar_id)
 
     
