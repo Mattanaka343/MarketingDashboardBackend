@@ -81,7 +81,8 @@ async def fetch_timeseries(
             SELECT
                 m.date,
                 SUM(CASE WHEN sma.channel = 'LinkedIn' THEN {col} ELSE 0 END) AS linkedin,
-                SUM(CASE WHEN sma.channel = 'X'   THEN {col} ELSE 0 END) AS x
+                SUM(CASE WHEN sma.channel = 'X'   THEN {col} ELSE 0 END) AS x,
+                SUM(CASE WHEN sma.channel = 'Instagram' THEN {col} ELSE 0 END) AS instagram
             FROM Metrics m
             JOIN SocialMediaAccounts sma
                 ON m.account_id = sma.id
